@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
+import Image from 'next/image';
+
 import { auth, db } from "@/app/Firebase/config";
 import { signOut } from "firebase/auth";
 import { Button } from "@/components/ui/button";
@@ -60,12 +62,14 @@ export default function Home() {
     setIsPPPVisible(true);
     setIsPension(false);
     setChangeRequest(false)
+    setAddharNumber(false)
   };
 
   const PensionHandler = () => {
     setIsPension(true);
     setIsPPPVisible(false);
     setChangeRequest(false)
+    setAddharNumber(false)
   };
 
   const OnLogoutHandler = () => {
@@ -76,11 +80,13 @@ export default function Home() {
     setChangeRequest(true)
     setIsPPPVisible(false)
     setIsPension(false)
+    setAddharNumber(false)
   }
   const clearAllHandler = () => {
     setChangeRequest(false)
     setIsPPPVisible(false)
     setIsPension(false)
+    setAddharNumber(false)
   }
   const FindByAddharNo = () => {
     setChangeRequest(false)
@@ -102,10 +108,12 @@ export default function Home() {
       {/* Sidebar */}
       <aside className="w-full md:w-64 bg-gradient-to-r bg-transparent text-white p-6 md:fixed h-full border-r border-gray-800">
         <div onClick={clearAllHandler} className="flex items-center justify-center mb-8">
-          <img
+        <Image
             src="https://img.icons8.com/?size=100&id=103413&format=png&color=ffffff"
             alt="Logo"
             className="h-12"
+            width={48}  // Adjust width as needed
+            height={48} // Adjust height as needed
           />
           <span className="ml-3 text-2xl font-semibold hidden md:block">Print Portal</span>
         </div>

@@ -1,12 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useAuthState, useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { useState } from "react";
+import {  useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "@/app/Firebase/config";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 export default function Login() {
-  const [user] = useAuthState(auth);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -102,11 +101,11 @@ export default function Login() {
           </button>
         </form>
         <p className="mt-4 text-center text-sm">
-          Don't have an account?{" "}
-          <a href="/Register" className="text-blue-500 hover:underline">
-            Sign up
-          </a>
-        </p>
+  Don&apos;t have an account?{" "}
+  <a href="/Register" className="text-blue-500 hover:underline">
+    Sign up
+  </a>
+</p>
       </div>
       {/* Toast container */}
       <ToastContainer />

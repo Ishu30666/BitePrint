@@ -32,12 +32,6 @@ const Admin = () => {
       router.push("/");
       setLoggedIn(false);
     }
-
-    
-
-
-
-
   }, [router]);
 
   return (
