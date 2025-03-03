@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
-import Image from 'next/image';
+//import Image from 'next/image';
 
 import { auth, db } from "@/app/Firebase/config";
 import { signOut } from "firebase/auth";
@@ -108,8 +108,8 @@ export default function Home() {
       {/* Sidebar */}
       <aside className="w-full md:w-64 bg-gradient-to-r bg-transparent text-white p-6 md:fixed h-full border-r border-gray-800">
         <div onClick={clearAllHandler} className="flex items-center justify-center mb-8">
-        <Image
-            src="https://img.icons8.com/?size=100&id=103413&format=png&color=ffffff"
+        <img
+            src="https://img.icons8.com/?size=100&id=IBgUXg3MQlTW&format=png&color=000000"
             alt="Logo"
             className="h-12"
             width={48}  // Adjust width as needed
