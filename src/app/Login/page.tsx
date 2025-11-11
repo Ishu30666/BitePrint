@@ -100,12 +100,7 @@ export default function Login() {
             Login
           </button>
         </form>
-        <p className="mt-4 text-center text-sm">
-  Don&apos;t have an account?{" "}
-  <a href="/Register" className="text-blue-500 hover:underline">
-    Sign up
-  </a>
-</p>
+        
       </div>
       {/* Toast container */}
       <ToastContainer />
