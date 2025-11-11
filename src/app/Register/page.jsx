@@ -29,7 +29,7 @@ export default function Register() {
     }
 
     if (password.length < 6) {
-      toast("Password must be at least 6 characters.");
+      toast(".");
       return false;
     }
     return true;
