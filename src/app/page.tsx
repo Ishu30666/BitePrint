@@ -1,5 +1,5 @@
 "use client";
-
+import { encryptApplicationNumber } from "@/lib/encryption";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -12,7 +12,6 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ToastContainer, toast } from "react-toastify";
 
-import { encryptApplicationNumber } from "@/lib/encryption";
 
 type ElectricityBoard = "UHBVN" | "DHBVN";
 
