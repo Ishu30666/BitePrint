@@ -1,5 +1,6 @@
+
 "use client";
-import { encryptApplicationNumber } from "@/lib/encryption";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -12,6 +13,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ToastContainer, toast } from "react-toastify";
 
+import { encryptApplicationNumber } from "@/lib/encryption";
 
 type ElectricityBoard = "UHBVN" | "DHBVN";
 
@@ -25,6 +27,7 @@ export default function Home() {
   const [addharNumber, setAddharNumber] = useState(false);
   const [isElectricity, setIsElectricity] = useState(false);
   const [isRapdrp, setIsRapdrp] = useState(false);
+  const [isSolar, setIsSolar] = useState(false);
 
   const [applicationNumber, setApplicationNumber] = useState("");
   const [electricityBoard, setElectricityBoard] =
@@ -48,6 +51,7 @@ export default function Home() {
     setAddharNumber(false);
     setIsElectricity(false);
     setIsRapdrp(false);
+    setIsSolar(false);
   };
 
   const PPPHandler = () => {
@@ -73,6 +77,11 @@ export default function Home() {
   const RapdrpHandler = () => {
     clearAllHandler();
     setIsRapdrp(true);
+  };
+
+  const SolarHandler = () => {
+    clearAllHandler();
+    setIsSolar(true);
   };
 
   const OnLogoutHandler = async () => {
@@ -109,7 +118,7 @@ export default function Home() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  // UHBVN / DHBVN — original encryption logic
+  // UHBVN / DHBVN — original hostnames and encryption logic
   const handleElectricitySearch = () => {
     const appNumber = applicationNumber.trim();
 
@@ -133,6 +142,30 @@ export default function Home() {
     } catch (error) {
       console.error("Application search failed:", error);
       toast.error("Unable to process the application number.");
+    }
+  };
+
+  // SOLAR — new option; uses the solar host for both boards
+  const handleSolarSearch = () => {
+    const appNumber = applicationNumber.trim();
+
+    if (!appNumber) {
+      toast.error("Please enter a solar application number.");
+      return;
+    }
+
+    try {
+      const encrypted = encryptApplicationNumber(appNumber);
+
+      const hostname = "https://esolarconn.dhbvn.org.in";
+
+      const destination =
+        `${hostname}/ConnectionConsumerDashBoard.aspx?${encrypted}`;
+
+      window.open(destination, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      console.error("Solar application search failed:", error);
+      toast.error("Unable to process the solar application number.");
     }
   };
 
@@ -216,31 +249,41 @@ export default function Home() {
               Find Aadhaar Number
             </button>
           </li>
-{
-  (user?.email == process.env.NEXT_PUBLIC_ADMIN_EMAIL) ? (
-    <>
-    
-          <li>
-            <button
-              type="button"
-              onClick={ElectricityHandler}
-              className="w-full rounded-lg p-2 text-left transition hover:bg-indigo-600"
-            >
-              UHBVN &amp; DHBVN
-            </button>
-          </li>
 
-          <li>
-            <button
-              type="button"
-              onClick={RapdrpHandler}
-              className="w-full rounded-lg p-2 text-left transition hover:bg-indigo-600"
-            >
-              RAPDRP Search
-            </button>
-          </li></>
-  ) :(<></>)
-}
+          {/* Admin-only options */}
+          {user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL && (
+            <>
+              <li>
+                <button
+                  type="button"
+                  onClick={ElectricityHandler}
+                  className="w-full rounded-lg p-2 text-left transition hover:bg-indigo-600"
+                >
+                  UHBVN &amp; DHBVN
+                </button>
+              </li>
+
+              <li>
+                <button
+                  type="button"
+                  onClick={RapdrpHandler}
+                  className="w-full rounded-lg p-2 text-left transition hover:bg-indigo-600"
+                >
+                  RAPDRP Search
+                </button>
+              </li>
+
+              <li>
+                <button
+                  type="button"
+                  onClick={SolarHandler}
+                  className="w-full rounded-lg p-2 text-left transition hover:bg-green-600"
+                >
+                  Solar Search
+                </button>
+              </li>
+            </>
+          )}
 
           <li>
             <button
@@ -391,7 +434,7 @@ export default function Home() {
           </form>
         )}
 
-        {/* UHBVN / DHBVN Application Search */}
+        {/* UHBVN / DHBVN Application Search — unchanged */}
         {isElectricity && (
           <Card className="mx-auto w-full max-w-lg border-gray-800 bg-gray-900 p-5">
             <h2 className="mb-5 text-center text-xl font-semibold">
@@ -456,7 +499,48 @@ export default function Home() {
           </Card>
         )}
 
-        {/* RAPDRP Search */}
+        {/* Solar Application Search — new option */}
+        {isSolar && (
+          <Card className="mx-auto w-full max-w-lg border-gray-800 bg-gray-900 p-5">
+            <h2 className="mb-5 text-center text-xl font-semibold">
+              Solar Application Search
+            </h2>
+
+            <div className="mb-5">
+              <Label htmlFor="solarApplicationNumber">
+                Application Number
+              </Label>
+
+              <Input
+                id="solarApplicationNumber"
+                type="text"
+                value={applicationNumber}
+                onChange={(e) =>
+                  setApplicationNumber(e.target.value)
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSolarSearch();
+                  }
+                }}
+                placeholder="Enter solar application number"
+                className="mt-2 bg-gray-800 text-white"
+                required
+              />
+            </div>
+
+            <Button
+              type="button"
+              onClick={handleSolarSearch}
+              className="w-full bg-green-600 hover:bg-green-700"
+            >
+              Search Solar Application
+            </Button>
+          </Card>
+        )}
+
+        {/* RAPDRP Search — unchanged */}
         {isRapdrp && (
           <Card className="mx-auto w-full max-w-lg border-gray-800 bg-gray-900 p-5">
             <h2 className="mb-5 text-center text-xl font-semibold">
