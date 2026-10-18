@@ -105,15 +105,24 @@ export default function Home() {
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASEMANAGMENT;
+ if (!familyId.trim()) {
+      toast.error("Please enter a valid Family ID.");
+      return;
+    }
+
+    const baseUrl = process.env.NEXT_PUBLIC_BASEMANAGMENT;
 
     if (!baseUrl) {
       toast.error("PPP configuration is missing.");
       return;
     }
 
-    const url = `${baseUrl}/Family/PrintFamilyDetails?familyId=${id}`;
+    const urlPP =
+      `${baseUrl}/Family/PrintFamilyDetails?familyId=${encodeURIComponent(
+        familyId.trim()
+      )}`;
 
-    window.open(url, "_blank", "noopener,noreferrer");
+    window.open(urlPP, "_blank", "noopener,noreferrer");
   };
 
   // UHBVN / DHBVN — original hostnames and encryption logic
