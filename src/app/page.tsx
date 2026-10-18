@@ -111,9 +111,7 @@ export default function Home() {
       return;
     }
 
-    const url = `${baseUrl}/Family/PrintFamilyDetails?familyId=${encodeURIComponent(
-      id
-    )}`;
+    const url = `${baseUrl}/Family/PrintFamilyDetails?familyId=${id}`;
 
     window.open(url, "_blank", "noopener,noreferrer");
   };
