@@ -96,26 +96,13 @@ export default function Home() {
   };
 
   // PPP Print — original URL
-  const handleSubmit = () => {
-    const id = familyId.trim();
-
-    if (!id) {
-      toast.error("Please enter a Family ID.");
-      return;
+   const handleSubmit = () => {
+    if (familyId) {
+      const urlPP = `${process.env.NEXT_PUBLIC_BASEMANAGMENT}/Family/PrintFamilyDetails?familyId=${familyId}`;
+      window.open(urlPP, "_blank");
+    } else {
+      console.log("Please enter a valid Family ID!");
     }
-
-    const baseUrl = process.env.NEXT_PUBLIC_BASEMANAGMENT;
-
-    if (!baseUrl) {
-      toast.error("PPP configuration is missing.");
-      return;
-    }
-
-    const url = `${baseUrl}/Family/PrintFamilyDetails?familyId=${encodeURIComponent(
-      id
-    )}`;
-
-    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   // UHBVN / DHBVN — original hostnames and encryption logic
