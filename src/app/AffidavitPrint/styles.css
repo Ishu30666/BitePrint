@@ -1,55 +1,438 @@
-* { box-sizing: border-box; }
-body { margin: 0; font-family: Arial, "Noto Sans Devanagari", sans-serif; background: #f1f5f9; color: #0f172a; }
-button, input, select { font: inherit; }
-.app { min-height: 100vh; }
-.topbar { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:22px 32px; background:#fff; border-bottom:1px solid #e2e8f0; }
-.topbar h1 { margin:0; font-size:24px; font-weight:750; }
-.topbar p { margin:7px 0 0; color:#64748b; font-size:14px; }
-.topbar-actions { display:flex; align-items:center; gap:10px; }
-.btn { border:0; border-radius:8px; padding:11px 16px; font-weight:650; cursor:pointer; transition:.2s; }
-.btn:disabled { opacity:.6; cursor:wait; }
-.btn-primary { background:#1d4ed8; color:#fff; }
-.btn-primary:hover:not(:disabled) { background:#1e40af; }
-.btn-secondary { background:#e2e8f0; color:#334155; }
-.btn-secondary:hover { background:#cbd5e1; }
-.layout { display:grid; grid-template-columns:minmax(330px,440px) minmax(0,1fr); gap:24px; padding:24px; align-items:start; }
-.editor { display:flex; flex-direction:column; gap:18px; }
-.section-heading h2,.preview-heading h2 { margin:0; font-size:20px; }
-.section-heading p,.preview-heading p { margin:6px 0 0; color:#64748b; font-size:13px; }
-.form-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:18px; box-shadow:0 2px 5px rgb(15 23 42 / 3%); }
-.form-card > h3 { margin:0 0 15px; font-size:16px; }
-.form-title { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
-.form-title h3 { margin:0; font-size:16px; }
-.form-title p { margin:5px 0 0; color:#64748b; font-size:12px; }
-.page-number { display:flex; width:38px; height:38px; align-items:center; justify-content:center; border-radius:10px; background:#dbeafe; color:#1d4ed8; font-weight:800; }
-.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-.form-field { display:flex; flex-direction:column; gap:7px; min-width:0; }
-.form-field > span { color:#475569; font-size:12px; font-weight:650; }
-.form-field input,.form-field select { width:100%; min-width:0; height:40px; padding:0 10px; border:1px solid #cbd5e1; border-radius:7px; background:#fff; color:#0f172a; outline:none; }
-.form-field input:focus,.form-field select:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgb(37 99 235 / 12%); }
-.download-full { width:100%; min-height:46px; }
-.preview-section { min-width:0; position:sticky; top:20px; }
-.preview-heading { display:flex; justify-content:space-between; align-items:center; gap:15px; margin-bottom:16px; }
-.page-count { background:#dcfce7; color:#166534; padding:7px 11px; border-radius:999px; font-size:12px; font-weight:700; }
-.preview-scroll { max-height:calc(100vh - 130px); overflow:auto; padding:18px; border:1px solid #e2e8f0; border-radius:12px; background:#e2e8f0; }
-.pdf-document { width:210mm; margin:0 auto; background:#fff; }
-.affidavit-page { width:210mm; height:297mm; padding:18mm 19mm 16mm; margin:0 auto 20px; background:#fff; color:#000; font-family:"Noto Sans Devanagari",Arial,sans-serif; font-size:12px; line-height:1.85; overflow:hidden; position:relative; }
-.affidavit-content { width:100%; }
-.affidavit-title { margin:0; text-align:center; font-size:23px; font-weight:800; }
-.affidavit-subtitle { margin:3px 0; text-align:center; font-size:14px; font-weight:700; }
-.affidavit-paragraph { margin-top:28px; }
-.affidavit-content p { text-align:justify; margin-bottom:14px; }
-.affidavit-content strong { font-weight:800; }
-.signature-area { margin-top:32px; }
-.signature-area > p { margin:5px 0; }
-.signature { display:flex; flex-direction:column; align-items:flex-end; margin-top:32px; text-align:right; line-height:1.7; }
-.verification { margin-top:30px; border-top:1px solid #000; padding-top:12px; }
-.verification h3 { text-align:center; font-size:14px; margin:0 0 10px; }
-.verification p { margin-bottom:18px; }
-.verification-bottom { display:flex; justify-content:space-between; gap:10px; }
-.verification-signature { margin-top:28px; text-align:right; }
-.pdf-page-1 { break-after:page; page-break-after:always; }
-.pdf-page-2 { break-before:page; page-break-before:always; }
-@media print { body { background:#fff; } .topbar,.editor,.preview-heading { display:none!important; } .layout { display:block; padding:0; } .preview-section { position:static; } .preview-scroll { max-height:none; overflow:visible; padding:0; border:0; background:#fff; } .pdf-document { width:210mm; margin:0; } .affidavit-page { margin:0; box-shadow:none; } }
-@media (max-width:1100px) { .layout { grid-template-columns:1fr; } .preview-section { position:static; } .preview-scroll { max-height:80vh; } }
-@media (max-width:650px) { .topbar { align-items:flex-start; flex-direction:column; padding:18px; } .topbar-actions { width:100%; } .topbar-actions .btn { flex:1; } .layout { padding:14px; } .form-grid { grid-template-columns:1fr; } }
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, "Noto Sans Devanagari", sans-serif;
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+/* Header */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 32px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 750;
+}
+
+.topbar p {
+  margin: 7px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Buttons */
+
+.btn {
+  border: 0;
+  border-radius: 8px;
+  padding: 11px 16px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.btn-primary {
+  background: #1d4ed8;
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1e40af;
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.btn-secondary:hover {
+  background: #cbd5e1;
+}
+
+.download-full {
+  width: 100%;
+  min-height: 46px;
+}
+
+/* Main layout */
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(330px, 440px) minmax(0, 1fr);
+  gap: 24px;
+  padding: 24px;
+  align-items: start;
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.section-heading h2,
+.preview-heading h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.section-heading p,
+.preview-heading p {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* Form cards */
+
+.form-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 2px 5px rgb(15 23 42 / 3%);
+}
+
+.form-card > h3 {
+  margin: 0 0 15px;
+  font-size: 16px;
+}
+
+.form-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.form-title h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.form-title p {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.page-number {
+  display: flex;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 800;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.form-field > span {
+  color: #475569;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.form-field input,
+.form-field select {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #fff;
+  color: #0f172a;
+  outline: none;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 12%);
+}
+
+/* Preview */
+
+.preview-section {
+  min-width: 0;
+  position: sticky;
+  top: 20px;
+}
+
+.preview-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 16px;
+}
+
+.page-count {
+  background: #dcfce7;
+  color: #166534;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.preview-scroll {
+  max-height: calc(100vh - 130px);
+  overflow: auto;
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #e2e8f0;
+}
+
+/* PDF document */
+
+.pdf-document {
+  width: 210mm;
+  margin: 0 auto;
+  padding: 0;
+  background: #fff;
+}
+
+.affidavit-page {
+  width: 210mm;
+  height: 297mm;
+  min-height: 297mm;
+  padding: 18mm 19mm 16mm;
+  margin: 0 0 20px;
+  box-sizing: border-box;
+  background: #fff;
+  color: #000;
+  font-family: "Noto Sans Devanagari", Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.85;
+  overflow: hidden;
+  position: relative;
+}
+
+.affidavit-content {
+  width: 100%;
+}
+
+.affidavit-title {
+  margin: 0;
+  text-align: center;
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.affidavit-subtitle {
+  margin: 3px 0;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.affidavit-paragraph {
+  margin-top: 28px;
+}
+
+.affidavit-content p {
+  text-align: justify;
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
+.affidavit-content strong {
+  font-weight: 800;
+}
+
+/* Signatures */
+
+.signature-area {
+  margin-top: 32px;
+}
+
+.signature-area > p {
+  margin: 5px 0;
+}
+
+.signature {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: 32px;
+  text-align: right;
+  line-height: 1.7;
+}
+
+/* Verification */
+
+.verification {
+  margin-top: 30px;
+  border-top: 1px solid #000;
+  padding-top: 12px;
+}
+
+.verification h3 {
+  text-align: center;
+  font-size: 14px;
+  margin: 0 0 10px;
+}
+
+.verification p {
+  margin-bottom: 18px;
+}
+
+.verification-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.verification-signature {
+  margin-top: 28px;
+  text-align: right;
+}
+
+/*
+  IMPORTANT:
+  Do not force CSS page breaks here.
+  Each affidavit will be rendered as its own PDF page.
+*/
+
+.pdf-page-1,
+.pdf-page-2 {
+  break-before: auto;
+  break-after: auto;
+  page-break-before: auto;
+  page-break-after: auto;
+}
+
+/* Print */
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .topbar,
+  .editor,
+  .preview-heading {
+    display: none !important;
+  }
+
+  .layout {
+    display: block;
+    padding: 0;
+  }
+
+  .preview-section {
+    position: static;
+  }
+
+  .preview-scroll {
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+    border: 0;
+    background: #fff;
+  }
+
+  .pdf-document {
+    width: 210mm;
+    margin: 0;
+  }
+
+  .affidavit-page {
+    margin: 0;
+    box-shadow: none;
+  }
+}
+
+/* Tablet */
+
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-section {
+    position: static;
+  }
+
+  .preview-scroll {
+    max-height: 80vh;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 650px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 18px;
+  }
+
+  .topbar-actions {
+    width: 100%;
+  }
+
+  .topbar-actions .btn {
+    flex: 1;
+  }
+
+  .layout {
+    padding: 14px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
