@@ -59,59 +59,60 @@ export default function AffidavitPrint() {
   };
 
   const downloadPdf = async () => {
-    if (!pdfRef.current || downloading) return;
+  if (!pdfRef.current || downloading) return;
 
-    setDownloading(true);
+  setDownloading(true);
 
-    try {
-      // Browser-only library: do not import at the top of this file.
-      const html2pdfModule = await import("html2pdf.js");
-      const html2pdf = html2pdfModule.default;
+  try {
+    const html2pdfModule = await import("html2pdf.js");
+    const html2pdf = html2pdfModule.default;
 
-      const safeName = (form.applicantName || "Applicant")
-        .replace(/[^\p{L}\p{N}_-]/gu, "_");
+    await html2pdf()
+      .set({
+        margin: 0,
 
-      await html2pdf()
-        .set({
-          margin: 0,
-          filename: `Electricity_Affidavit_${safeName}.pdf`,
+        filename: `Electricity_Affidavit_${
+          (form.applicantName || "Applicant").replace(
+            /[^\p{L}\p{N}_-]/gu,
+            "_"
+          )
+        }.pdf`,
 
-          image: {
-            type: "jpeg",
-            quality: 0.98,
-          },
+        image: {
+          type: "jpeg",
+          quality: 0.98,
+        },
 
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: "#ffffff",
-            logging: false,
-            scrollX: 0,
-            scrollY: 0,
-          },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          logging: false,
+          scrollX: 0,
+          scrollY: 0,
+        },
 
-          jsPDF: {
-            unit: "mm",
-            format: "a4",
-            orientation: "portrait",
-            compress: true,
-          },
+        jsPDF: {
+          unit: "mm",
+          format: "a4",
+          orientation: "portrait",
+          compress: true,
+        },
 
-          pagebreak: {
-            mode: ["css", "legacy"],
-            before: [".pdf-page-2"],
-          },
-        })
-        .from(pdfRef.current)
-        .save();
-    } catch (error) {
-      console.error("PDF generation failed:", error);
-      window.alert("Unable to generate PDF. Please try again.");
-    } finally {
-      setDownloading(false);
-    }
-  };
-
+        // Do not add another manual page break here.
+        pagebreak: {
+          mode: [],
+        },
+      })
+      .from(pdfRef.current)
+      .save();
+  } catch (error) {
+    console.error("PDF generation failed:", error);
+    window.alert("Unable to generate PDF. Please try again.");
+  } finally {
+    setDownloading(false);
+  }
+};
   const Field = ({ label, name }) => (
     <label className="form-field">
       <span>{label}</span>
