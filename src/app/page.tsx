@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { signOut } from "firebase/auth";
-
+// import {useRouter} from "next/navigation";
 import { auth } from "@/app/Firebase/config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -96,13 +96,26 @@ export default function Home() {
   };
 
   // PPP Print — original URL
-   const handleSubmit = () => {
-    if (familyId) {
-      const urlPP = `${process.env.NEXT_PUBLIC_BASEMANAGMENT}/Family/PrintFamilyDetails?familyId=${familyId}`;
-      window.open(urlPP, "_blank");
-    } else {
-      console.log("Please enter a valid Family ID!");
+  const handleSubmit = () => {
+    const id = familyId.trim();
+
+    if (!id) {
+      toast.error("Please enter a Family ID.");
+      return;
     }
+
+    const baseUrl = process.env.NEXT_PUBLIC_BASEMANAGMENT;
+
+    if (!baseUrl) {
+      toast.error("PPP configuration is missing.");
+      return;
+    }
+
+    const url = `${baseUrl}/Family/PrintFamilyDetails?familyId=${encodeURIComponent(
+      id
+    )}`;
+
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   // UHBVN / DHBVN — original hostnames and encryption logic
@@ -267,6 +280,17 @@ export default function Home() {
                   className="w-full rounded-lg p-2 text-left transition hover:bg-green-600"
                 >
                   Solar Search
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={()=>{
+                    router.push("/AffidavitPrint")
+                  }}
+                  className="w-full rounded-lg p-2 text-left transition hover:bg-green-600"
+                >
+                  Affidavit Print
                 </button>
               </li>
             </>
