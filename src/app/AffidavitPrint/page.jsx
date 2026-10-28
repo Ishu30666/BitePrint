@@ -40,7 +40,7 @@ const initialForm = {
 };
 
 export default function AffidavitPrint() {
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState({ ...initialForm });
   const [downloading, setDownloading] = useState(false);
 
   const pdfRef = useRef(null);
@@ -58,54 +58,81 @@ export default function AffidavitPrint() {
     setForm({ ...initialForm });
   };
 
-  const downloadPdf = async () => {
+ const downloadPdf = async () => {
   if (!pdfRef.current || downloading) return;
 
   setDownloading(true);
 
   try {
-    const html2pdfModule = await import("html2pdf.js");
-    const html2pdf = html2pdfModule.default;
+    // Import the browser-side PDF libraries.
+    const html2canvasModule = await import("html2canvas");
+    const jsPDFModule = await import("jspdf");
 
-    await html2pdf()
-      .set({
-        margin: 0,
+    const html2canvas = html2canvasModule.default;
+    const jsPDF = jsPDFModule.jsPDF;
 
-        filename: `Electricity_Affidavit_${
-          (form.applicantName || "Applicant").replace(
-            /[^\p{L}\p{N}_-]/gu,
-            "_"
-          )
-        }.pdf`,
+    const safeName = (form.applicantName || "Applicant").replace(
+      /[^\p{L}\p{N}_-]/gu,
+      "_"
+    );
 
-        image: {
-          type: "jpeg",
-          quality: 0.98,
-        },
+    const pages = pdfRef.current.querySelectorAll(".affidavit-page");
 
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#ffffff",
-          logging: false,
-          scrollX: 0,
-          scrollY: 0,
-        },
+    if (pages.length !== 2) {
+      throw new Error("Exactly two affidavit pages are required.");
+    }
 
-        jsPDF: {
-          unit: "mm",
-          format: "a4",
-          orientation: "portrait",
-          compress: true,
-        },
+    // Create one A4 PDF containing exactly two pages.
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+      compress: true,
+    });
 
-        // Do not add another manual page break here.
-        pagebreak: {
-          mode: [],
-        },
-      })
-      .from(pdfRef.current)
-      .save();
+    const pageWidth = 210;
+    const pageHeight = 297;
+
+    for (let i = 0; i < pages.length; i++) {
+      const element = pages[i];
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+        scrollX: 0,
+        scrollY: 0,
+        width: element.scrollWidth,
+        height: element.scrollHeight,
+      });
+
+      const imageData = canvas.toDataURL("image/jpeg", 0.98);
+
+      // The first page already exists in jsPDF.
+      // Add exactly one new page for the second affidavit.
+      if (i > 0) {
+        pdf.addPage("a4", "portrait");
+      }
+
+      // Fit each affidavit onto one complete A4 page.
+      pdf.addImage(
+        imageData,
+        "JPEG",
+        0,
+        0,
+        pageWidth,
+        pageHeight,
+        undefined,
+        "FAST"
+      );
+
+      // Release canvas memory.
+      canvas.width = 0;
+      canvas.height = 0;
+    }
+
+    pdf.save(`Electricity_Affidavit_${safeName}.pdf`);
   } catch (error) {
     console.error("PDF generation failed:", error);
     window.alert("Unable to generate PDF. Please try again.");
@@ -113,9 +140,11 @@ export default function AffidavitPrint() {
     setDownloading(false);
   }
 };
+  // Reusable form field.
   const Field = ({ label, name }) => (
     <label className="form-field">
       <span>{label}</span>
+
       <input
         type="text"
         name={name}
@@ -127,6 +156,7 @@ export default function AffidavitPrint() {
 
   return (
     <div className="app">
+      {/* HEADER */}
       <header className="topbar">
         <div>
           <h1>Electricity Affidavit Generator</h1>
@@ -156,13 +186,14 @@ export default function AffidavitPrint() {
       </header>
 
       <main className="layout">
-        {/* LEFT: FORM */}
+        {/* LEFT: FORM EDITOR */}
         <section className="editor">
           <div className="section-heading">
             <h2>Application Details</h2>
             <p>Changes update the live preview automatically.</p>
           </div>
 
+          {/* ELECTRICITY BOARD */}
           <div className="form-card">
             <h3>Electricity Board</h3>
 
@@ -180,10 +211,11 @@ export default function AffidavitPrint() {
             </label>
           </div>
 
-          {/* PAGE 1 FIELDS */}
+          {/* PAGE 1 FORM */}
           <div className="form-card">
             <div className="form-title">
               <span className="page-number">01</span>
+
               <div>
                 <h3>Deceased Account Holder</h3>
                 <p>First affidavit details</p>
@@ -192,26 +224,39 @@ export default function AffidavitPrint() {
 
             <div className="form-grid">
               <Field label="Applicant Name" name="applicantName" />
-              <Field label="Applicant Father's Name" name="applicantFather" />
+
+              <Field
+                label="Applicant Father's Name"
+                name="applicantFather"
+              />
+
               <Field label="Village" name="village" />
               <Field label="Tehsil" name="tehsil" />
               <Field label="District" name="district" />
               <Field label="State" name="state" />
+
               <Field label="Account Number" name="accountNo" />
-              <Field label="Deceased Account Holder" name="currentHolder" />
+
+              <Field
+                label="Deceased Account Holder"
+                name="currentHolder"
+              />
+
               <Field
                 label="Deceased Father's Name"
                 name="currentHolderFather"
               />
+
               <Field label="Date" name="date" />
               <Field label="Place" name="place" />
             </div>
           </div>
 
-          {/* PAGE 2 FIELDS */}
+          {/* PAGE 2 FORM */}
           <div className="form-card">
             <div className="form-title">
               <span className="page-number">02</span>
+
               <div>
                 <h3>Consent Affidavit</h3>
                 <p>Second affidavit details</p>
@@ -219,18 +264,33 @@ export default function AffidavitPrint() {
             </div>
 
             <div className="form-grid">
-              <Field label="Existing Account Holder" name="consentHolder" />
+              <Field
+                label="Existing Account Holder"
+                name="consentHolder"
+              />
+
               <Field
                 label="Account Holder Father's Name"
                 name="consentHolderFather"
               />
+
               <Field label="Village" name="consentVillage" />
               <Field label="Tehsil" name="consentTehsil" />
               <Field label="District" name="consentDistrict" />
               <Field label="State" name="consentState" />
+
               <Field label="Account Number" name="consentAccountNo" />
-              <Field label="Person Receiving Connection" name="transferName" />
-              <Field label="Recipient Father's Name" name="transferFather" />
+
+              <Field
+                label="Person Receiving Connection"
+                name="transferName"
+              />
+
+              <Field
+                label="Recipient Father's Name"
+                name="transferFather"
+              />
+
               <Field label="Date" name="consentDate" />
               <Field label="Place" name="consentPlace" />
             </div>
@@ -248,23 +308,26 @@ export default function AffidavitPrint() {
           </button>
         </section>
 
-        {/* RIGHT: BOTH AFFIDAVIT PAGES */}
+        {/* RIGHT: LIVE PREVIEW */}
         <section className="preview-section">
           <div className="preview-heading">
             <div>
               <h2>Live Preview</h2>
               <p>Both affidavit pages are included in the download.</p>
             </div>
+
             <span className="page-count">2 Pages</span>
           </div>
 
           <div className="preview-scroll">
             <div ref={pdfRef} className="pdf-document">
-              {/* ================= PAGE 1 ================= */}
+              {/* ==================== PAGE 1 ==================== */}
               <article className="affidavit-page pdf-page-1">
                 <div className="affidavit-content">
                   <h2 className="affidavit-title">शपथपत्र</h2>
+
                   <h3 className="affidavit-subtitle">AFFIDAVIT</h3>
+
                   <h3 className="affidavit-subtitle">
                     (बिजली कनेक्शन के नाम सुधार हेतु – {form.OfficeTyp})
                   </h3>
@@ -320,6 +383,7 @@ export default function AffidavitPrint() {
                     <p>
                       दिनांक: <strong>{form.date}</strong>
                     </p>
+
                     <p>
                       स्थान: <strong>{form.place}</strong>
                     </p>
@@ -333,6 +397,7 @@ export default function AffidavitPrint() {
 
                   <div className="verification">
                     <h3>सत्यापन / VERIFICATION</h3>
+
                     <p>
                       मैं सत्यापित करता/करती हूँ कि इस शपथपत्र में लिखे गए
                       कथन मेरे ज्ञान एवं विश्वास के अनुसार सत्य और सही हैं
@@ -352,11 +417,13 @@ export default function AffidavitPrint() {
                 </div>
               </article>
 
-              {/* ================= PAGE 2 ================= */}
+              {/* ==================== PAGE 2 ==================== */}
               <article className="affidavit-page pdf-page-2">
                 <div className="affidavit-content">
                   <h2 className="affidavit-title">शपथपत्र</h2>
+
                   <h3 className="affidavit-subtitle">AFFIDAVIT</h3>
+
                   <h3 className="affidavit-subtitle">
                     (बिजली कनेक्शन हस्तांतरण हेतु सहमति पत्र –{" "}
                     {form.OfficeTyp})
@@ -421,6 +488,7 @@ export default function AffidavitPrint() {
                     <p>
                       दिनांक: <strong>{form.consentDate}</strong>
                     </p>
+
                     <p>
                       स्थान: <strong>{form.consentPlace}</strong>
                     </p>
@@ -434,6 +502,7 @@ export default function AffidavitPrint() {
 
                   <div className="verification">
                     <h3>सत्यापन / VERIFICATION</h3>
+
                     <p>
                       मैं सत्यापित करता हूँ कि इस शपथपत्र में लिखे गए कथन
                       मेरे ज्ञान एवं विश्वास के अनुसार सत्य और सही हैं तथा
