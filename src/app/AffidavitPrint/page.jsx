@@ -323,7 +323,7 @@ export default function AffidavitPrint() {
             <div ref={pdfRef} className="pdf-document">
               {/* ==================== PAGE 1 ==================== */}
               <article className="affidavit-page pdf-page-1">
-                <div className="affidavit-content">
+                <div className="affidavit-content"><br /><br /><br /><br /><br /><br />
                   <h2 className="affidavit-title">शपथपत्र</h2>
 
                   <h3 className="affidavit-subtitle">AFFIDAVIT</h3>
@@ -419,7 +419,7 @@ export default function AffidavitPrint() {
 
               {/* ==================== PAGE 2 ==================== */}
               <article className="affidavit-page pdf-page-2">
-                <div className="affidavit-content">
+                <div className="affidavit-content"><br /><br /><br /><br /><br /><br />
                   <h2 className="affidavit-title">शपथपत्र</h2>
 
                   <h3 className="affidavit-subtitle">AFFIDAVIT</h3>
